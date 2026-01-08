@@ -12,9 +12,6 @@ let currentColorScheme = 2; // Fixed to Universal Blue
 
 // DOM Elements
 const getLocationBtn = document.getElementById('getLocationBtn');
-const locationInfo = document.getElementById('locationInfo');
-const coordinates = document.getElementById('coordinates');
-const address = document.getElementById('address');
 const mapContainer = document.getElementById('mapContainer');
 const colorbarContainer = document.getElementById('colorbarContainer');
 const weatherContainer = document.getElementById('weatherContainer');
@@ -65,15 +62,6 @@ function onLocationSuccess(position) {
     const lon = position.coords.longitude;
     
     userLocation = { lat, lon };
-    
-    // Update coordinates display
-    coordinates.textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-    
-    // Show location info
-    locationInfo.classList.remove('hidden');
-    
-    // Get address from coordinates
-    getAddressFromCoordinates(lat, lon);
     
     // Initialize map
     initializeMap(lat, lon);
@@ -134,32 +122,6 @@ async function initializeWeatherLayers() {
             opacity: 0.7,
             zIndex: 200
         });
-    }
-}
-
-// Get address from coordinates using Open-Meteo geocoding
-async function getAddressFromCoordinates(lat, lon) {
-    try {
-        const response = await fetch(
-            `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}`
-        );
-        
-        if (response.ok) {
-            const data = await response.json();
-            if (data.results && data.results.length > 0) {
-                const location = data.results[0];
-                const parts = [];
-                if (location.name) parts.push(location.name);
-                if (location.admin1) parts.push(location.admin1);
-                if (location.country) parts.push(location.country);
-                
-                const addressText = parts.join(', ');
-                address.textContent = addressText;
-            }
-        }
-    } catch (error) {
-        console.error('Error getting address:', error);
-        address.textContent = 'Address not available';
     }
 }
 
