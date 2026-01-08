@@ -153,11 +153,6 @@ header p {
     text-align: center;
     display: block;
 }
-    font-size: 16px;
-    line-height: 30px;
-    text-align: center;
-    display: block;
-}
 
 .colorbar-container {
     margin-top: 8px;
@@ -167,16 +162,17 @@ header p {
     height: 20px;
     width: 100%;
     background: linear-gradient(to right, 
-        /*rgba(200, 200, 200, 0.8) 0%,       /* dBZ 0 - light gray with transparency */
-        /*rgba(206, 192, 135, 1) 20%,        /* dBZ 10 - tan/brown */
-        /*rgba(0, 163, 224, 1) 40%,          /* dBZ 20 - bright blue */
-        /*rgba(255, 238, 0, 1) 70%,          /* dBZ 35 - bright yellow */
-        /*ba(193, 0, 0, 1) 100%            /* dBZ 50+ - red */
-        rgba(130,123,105,0.29) 0%,       /* dBZ 0 - light gray with transparency */
-        rgba(206,192,135,0.59) 20%,        /* dBZ 10 - tan/brown */
-        rgba(0,163,224,1) 40%,          /* dBZ 20 - bright blue */
-        rgba(255,238,0,1) 70%,          /* dBZ 35 - bright yellow */
-        rgba(193,0,0,1) 100%            /* dBZ 50+ - red */
+    #827b6949 0%,
+    #92887164 10%,
+    #cec08796 20%,
+    #88ddeeff 30%,
+    #00a3e0ff 40%,
+    #0077aaff 50%,
+    #005588ff 60%,
+    #ffee00ff 70%,
+    #ffaa00ff   80%,
+    #ff4400ff 90%,
+    #c10000ff 100%
     );
     border: 2px solid rgba(0, 0, 0, 0.8);
     border-radius: 3px;
