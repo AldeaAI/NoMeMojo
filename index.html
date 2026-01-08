@@ -25,23 +25,20 @@
 
             <div id="mapContainer" class="map-container hidden">
                 <div id="map"></div>
-                <div class="weather-legend">
-                    <strong>Weather Radar:</strong>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: rgba(0, 255, 0, 0.5);"></div>
-                        <span>🌦️ Light Rain</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: rgba(255, 255, 0, 0.7);"></div>
-                        <span>🌧️ Moderate Rain</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: rgba(255, 0, 0, 0.8);"></div>
-                        <span>⛈️ Heavy Rain</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: rgba(255, 0, 255, 0.9);"></div>
-                        <span>🌪️ Severe</span>
+            </div>
+            
+            <div id="colorbarContainer" class="colorbar-container-outer hidden">
+                <div class="weather-legend-external">
+                    <div class="colorbar-container">
+                        <div class="universal-blue-colorbar"></div>
+                        <div class="colorbar-labels">
+                            <span>0</span>
+                            <span>10</span>
+                            <span>20</span>
+                            <span>35</span>
+                            <span>50+</span>
+                        </div>
+                        <div class="colorbar-unit">dBZ</div>
                     </div>
                 </div>
             </div>

@@ -7,7 +7,8 @@ let map = null;
 let userMarker = null;
 let userLocation = null;
 let precipitationLayer = null;
-let cloudsLayer = null;
+let currentColorScheme = 2; // Fixed to Universal Blue
+
 
 // DOM Elements
 const getLocationBtn = document.getElementById('getLocationBtn');
@@ -15,6 +16,7 @@ const locationInfo = document.getElementById('locationInfo');
 const coordinates = document.getElementById('coordinates');
 const address = document.getElementById('address');
 const mapContainer = document.getElementById('mapContainer');
+const colorbarContainer = document.getElementById('colorbarContainer');
 const weatherContainer = document.getElementById('weatherContainer');
 const errorContainer = document.getElementById('errorContainer');
 const loadingContainer = document.getElementById('loadingContainer');
@@ -114,31 +116,20 @@ async function initializeWeatherLayers() {
             const timestamp = latestRadar.time;
             
             // Update precipitation layer with latest timestamp
-            precipitationLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${timestamp}/512/{z}/{x}/{y}/2/1_1.png`, {
+            precipitationLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${timestamp}/512/{z}/{x}/{y}/${currentColorScheme}/1_1.png`, {
                 attribution: '&copy; <a href="https://rainviewer.com">RainViewer</a>',
                 opacity: 0.7,
                 zIndex: 200
             });
         }
         
-        // Try to set up a simple cloud layer using a different free service
-        cloudsLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '',
-            opacity: 0,
-            zIndex: 100
-        });
-        
-        // Use satellite imagery for cloud visualization instead
-        cloudsLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
-            opacity: 0.3,
-            zIndex: 100
-        });
+        // No cloud layer - focusing only on precipitation radar
+        cloudsLayer = null;
         
     } catch (error) {
         console.error('Error initializing weather layers:', error);
         // Fallback to basic precipitation layer
-        precipitationLayer = L.tileLayer('https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png', {
+        precipitationLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/${currentColorScheme}/1_1.png`, {
             attribution: '&copy; <a href="https://rainviewer.com">RainViewer</a>',
             opacity: 0.7,
             zIndex: 200
@@ -174,16 +165,19 @@ async function getAddressFromCoordinates(lat, lon) {
 
 // Initialize the map
 function initializeMap(lat, lon) {
-    // Show map container
+    // Show map container and colorbar
     mapContainer.classList.remove('hidden');
+    colorbarContainer.classList.remove('hidden');
     
     // Initialize map if not already created
     if (!map) {
         map = L.map('map').setView([lat, lon], 10);
         
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        // Add grayscale OpenStreetMap tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
         }).addTo(map);
         
         // Add precipitation layer using RainViewer (free, no API key needed)
@@ -202,58 +196,9 @@ function initializeMap(lat, lon) {
             if (precipitationLayer) {
                 precipitationLayer.addTo(map);
             }
-            
-            // Add layer control
-            const baseLayers = {
-                "🗺️ Street Map": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                })
-            };
-            
-            const overlayLayers = {
-                "🌧️ Rain Radar": precipitationLayer
-            };
-            
-            // Add clouds layer if available
-            if (cloudsLayer) {
-                cloudsLayer.addTo(map);
-                overlayLayers["☁️ Satellite Clouds"] = cloudsLayer;
-            }
-            
-            L.control.layers(baseLayers, overlayLayers, {
-                position: 'topright',
-                collapsed: false
-            }).addTo(map);
         });
         
-        // Add refresh button for weather layers
-        const refreshControl = L.Control.extend({
-            options: {
-                position: 'topleft'
-            },
-            onAdd: function(map) {
-                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-                container.style.backgroundColor = 'white';
-                container.style.backgroundImage = 'none';
-                container.style.width = '30px';
-                container.style.height = '30px';
-                container.style.borderRadius = '5px';
-                container.style.cursor = 'pointer';
-                container.title = 'Refresh Weather Layers';
-                container.innerHTML = '🔄';
-                container.style.fontSize = '16px';
-                container.style.lineHeight = '30px';
-                container.style.textAlign = 'center';
-                
-                container.onclick = function() {
-                    refreshWeatherLayers();
-                };
-                
-                return container;
-            }
-        });
-        
-        new refreshControl().addTo(map);
+
         
     } else {
         // Update map view
@@ -486,7 +431,7 @@ async function refreshWeatherLayers() {
             }
             
             // Create new precipitation layer with latest data
-            precipitationLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${timestamp}/512/{z}/{x}/{y}/2/1_1.png`, {
+            precipitationLayer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${timestamp}/512/{z}/{x}/{y}/${currentColorScheme}/1_1.png`, {
                 attribution: '&copy; <a href="https://rainviewer.com">RainViewer</a>',
                 opacity: 0.7,
                 zIndex: 200
@@ -555,6 +500,8 @@ function showError(message) {
 function hideError() {
     errorContainer.classList.add('hidden');
 }
+
+
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
