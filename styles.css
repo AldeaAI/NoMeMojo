@@ -220,6 +220,47 @@ header p {
     border-radius: 2px;
 }
 
+/* dBZ Chart Container */
+.chart-container {
+    margin: 20px 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.chart-header h3 {
+    color: #0984e3;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.chart-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+}
+
+#dbzChart {
+    width: 100% !important;
+    height: 300px !important;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
 /* Weather container */
 .weather-container {
     display: grid;
@@ -414,6 +455,23 @@ footer p {
     
     header h1 {
         font-size: 1.8rem;
+    }
+    
+    .chart-container {
+        margin: 15px;
+        padding: 15px;
+    }
+    
+    .chart-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .chart-wrapper {
+        height: 250px;
+    }
+    
+    #dbzChart {
+        height: 250px !important;
     }
     
     .weather-card, .rain-card, .forecast-card {
