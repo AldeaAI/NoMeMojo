@@ -26,6 +26,12 @@ const errorContainer = document.getElementById('errorContainer');
 const loadingContainer = document.getElementById('loadingContainer');
 const errorMessage = document.getElementById('errorMessage');
 
+// Radar playback elements
+const radarControls = document.getElementById('radarControls');
+const playBtn = document.getElementById('playBtn');
+const timeSlider = document.getElementById('timeSlider');
+const timeLabel = document.getElementById('timeLabel');
+
 // Weather data elements
 const temperatureEl = document.getElementById('temperature');
 const weatherConditionEl = document.getElementById('weatherCondition');
@@ -36,11 +42,6 @@ const rainVolume1hEl = document.getElementById('rainVolume1h');
 const rainVolume3hEl = document.getElementById('rainVolume3h');
 const cloudsEl = document.getElementById('clouds');
 const forecastContainer = document.getElementById('forecastContainer');
-
-// Radar playback elements
-const playBtn = document.getElementById('playBtn');
-const timeSlider = document.getElementById('timeSlider');
-const timeLabel = document.getElementById('timeLabel');
 
 // Event Listeners
 getLocationBtn.addEventListener('click', getUserLocation);
@@ -146,23 +147,24 @@ async function initializeWeatherLayers() {
 
 // Initialize the map
 function initializeMap(lat, lon) {
-    // Show map container and colorbar
+    // Show map container, colorbar, and radar controls
     mapContainer.classList.remove('hidden');
     colorbarContainer.classList.remove('hidden');
+    if (radarControls) radarControls.classList.remove('hidden');
     
     // Initialize map if not already created
     if (!map) {
         map = L.map('map').setView([lat, lon], 10);
         
-        // Add grayscale OpenStreetMap tiles
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        // Add dark base layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 20
         }).addTo(map);
         
         // Add precipitation layer using RainViewer (free, no API key needed)
-        precipitationLayer = L.tileLayer('https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/2/1_1.png', {
+        precipitationLayer = L.tileLayer('https://tilecache.rainviewer.com/v2/radar/0/{z}/{x}/{y}/1/1_1.png', {
             attribution: '&copy; <a href="https://rainviewer.com">RainViewer</a>',
             opacity: 0.7,
             zIndex: 200
@@ -178,8 +180,6 @@ function initializeMap(lat, lon) {
                 precipitationLayer.addTo(map);
             }
         });
-        
-
         
     } else {
         // Update map view

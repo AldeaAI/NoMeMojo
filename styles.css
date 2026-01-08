@@ -153,6 +153,11 @@ header p {
     text-align: center;
     display: block;
 }
+    font-size: 16px;
+    line-height: 30px;
+    text-align: center;
+    display: block;
+}
 
 .colorbar-container {
     margin-top: 8px;
@@ -162,11 +167,16 @@ header p {
     height: 20px;
     width: 100%;
     background: linear-gradient(to right, 
-        rgba(200, 200, 200, 0.8) 0%,       /* dBZ 0 - light gray with transparency */
-        rgba(206, 192, 135, 1) 20%,        /* dBZ 10 - tan/brown */
-        rgba(0, 163, 224, 1) 40%,          /* dBZ 20 - bright blue */
-        rgba(255, 238, 0, 1) 70%,          /* dBZ 35 - bright yellow */
-        rgba(193, 0, 0, 1) 100%            /* dBZ 50+ - red */
+        /*rgba(200, 200, 200, 0.8) 0%,       /* dBZ 0 - light gray with transparency */
+        /*rgba(206, 192, 135, 1) 20%,        /* dBZ 10 - tan/brown */
+        /*rgba(0, 163, 224, 1) 40%,          /* dBZ 20 - bright blue */
+        /*rgba(255, 238, 0, 1) 70%,          /* dBZ 35 - bright yellow */
+        /*ba(193, 0, 0, 1) 100%            /* dBZ 50+ - red */
+        rgba(130,123,105,0.29) 0%,       /* dBZ 0 - light gray with transparency */
+        rgba(206,192,135,0.59) 20%,        /* dBZ 10 - tan/brown */
+        rgba(0,163,224,1) 40%,          /* dBZ 20 - bright blue */
+        rgba(255,238,0,1) 70%,          /* dBZ 35 - bright yellow */
+        rgba(193,0,0,1) 100%            /* dBZ 50+ - red */
     );
     border: 2px solid rgba(0, 0, 0, 0.8);
     border-radius: 3px;
@@ -182,6 +192,15 @@ header p {
     margin-top: 5px;
     font-size: 0.7rem;
     color: #666;
+}
+
+.colorbar-descriptions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+    font-size: 0.6rem;
+    color: #888;
+    font-style: italic;
 }
 
 .colorbar-unit {
@@ -408,18 +427,15 @@ footer p {
 
 /* Radar Playback Controls */
 .radar-controls {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
-    padding: 15px;
+    padding: 20px;
+    margin-top: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    z-index: 1000;
-    min-width: 320px;
+    width: 100%;
+    max-width: none;
 }
 
 .controls-header {
@@ -545,11 +561,8 @@ footer p {
 /* Responsive radar controls */
 @media (max-width: 480px) {
     .radar-controls {
-        left: 10px;
-        right: 10px;
-        transform: none;
-        min-width: unset;
-        bottom: 10px;
+        margin-top: 15px;
+        padding: 15px;
     }
     
     .controls-main {
