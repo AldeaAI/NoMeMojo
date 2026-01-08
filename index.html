@@ -21,6 +21,27 @@
 
             <div id="mapContainer" class="map-container hidden">
                 <div id="map"></div>
+                
+                <!-- Radar Playback Controls -->
+                <div id="radarControls" class="radar-controls">
+                    <div class="controls-header">
+                        <span class="controls-title">🌧️ Radar Playback</span>
+                    </div>
+                    <div class="controls-main">
+                        <button id="playBtn" class="control-btn">▶️</button>
+                        <div class="time-info">
+                            <span id="timeLabel">Now</span>
+                        </div>
+                        <div class="timeline-container">
+                            <input type="range" id="timeSlider" class="time-slider" min="0" max="23" value="12" step="1">
+                            <div class="timeline-markers">
+                                <span class="marker past">Past</span>
+                                <span class="marker current">Now</span>
+                                <span class="marker future">Forecast</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div id="colorbarContainer" class="colorbar-container-outer hidden">

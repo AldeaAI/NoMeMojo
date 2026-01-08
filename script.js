@@ -9,6 +9,13 @@ let userLocation = null;
 let precipitationLayer = null;
 let currentColorScheme = 2; // Fixed to Universal Blue
 
+// Radar playback variables
+let radarTimestamps = [];
+let currentTimeIndex = 12; // Start at current time
+let isPlaying = false;
+let playInterval = null;
+let availableRadarData = null;
+
 
 // DOM Elements
 const getLocationBtn = document.getElementById('getLocationBtn');
@@ -30,8 +37,17 @@ const rainVolume3hEl = document.getElementById('rainVolume3h');
 const cloudsEl = document.getElementById('clouds');
 const forecastContainer = document.getElementById('forecastContainer');
 
+// Radar playback elements
+const playBtn = document.getElementById('playBtn');
+const timeSlider = document.getElementById('timeSlider');
+const timeLabel = document.getElementById('timeLabel');
+
 // Event Listeners
 getLocationBtn.addEventListener('click', getUserLocation);
+
+// Radar playback event listeners
+if (playBtn) playBtn.addEventListener('click', togglePlayback);
+if (timeSlider) timeSlider.addEventListener('input', onTimeSliderChange);
 
 // Main function to get user location
 function getUserLocation() {
@@ -68,6 +84,9 @@ function onLocationSuccess(position) {
     
     // Get weather data
     getWeatherData(lat, lon);
+    
+    // Initialize radar playback
+    initializeRadarPlayback();
 }
 
 // Handle location error
@@ -461,6 +480,181 @@ function showError(message) {
 
 function hideError() {
     errorContainer.classList.add('hidden');
+}
+
+// Radar Playback Functions
+async function initializeRadarPlayback() {
+    try {
+        // Fetch available radar timestamps
+        const response = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+        const data = await response.json();
+        
+        if (data && data.radar) {
+            availableRadarData = data.radar;
+            
+            // Create focused timeline: 3 past + current (most recent past) + 3 forecast
+            radarTimestamps = [];
+            
+            if (data.radar.past && data.radar.past.length > 0) {
+                // Use most recent past frame as "current"
+                const mostRecentPast = data.radar.past[data.radar.past.length - 1];
+                
+                // Add 3 frames before the most recent (if they exist)
+                const pastFrames = data.radar.past.slice(-4, -1); // Get 3 frames before the last one
+                radarTimestamps.push(...pastFrames.map(frame => ({
+                    timestamp: frame.time,
+                    type: 'past',
+                    path: frame.path
+                })));
+                
+                // Add most recent past frame as current
+                radarTimestamps.push({
+                    timestamp: mostRecentPast.time,
+                    type: 'current',
+                    path: mostRecentPast.path
+                });
+            } else {
+                // Fallback: use generated timestamp if no past data
+                const currentTime = data.generated || Math.floor(Date.now() / 1000);
+                radarTimestamps.push({
+                    timestamp: currentTime,
+                    type: 'current',
+                    path: null
+                });
+            }
+            
+            // Add first 3 forecast frames
+            if (data.radar.nowcast && data.radar.nowcast.length > 0) {
+                const firstThreeForecast = data.radar.nowcast.slice(0, 3);
+                radarTimestamps.push(...firstThreeForecast.map(frame => ({
+                    timestamp: frame.time,
+                    type: 'forecast',
+                    path: frame.path
+                })));
+            }
+            
+            // Set current time index
+            currentTimeIndex = radarTimestamps.findIndex(frame => frame.type === 'current');
+            if (currentTimeIndex === -1) currentTimeIndex = Math.floor(radarTimestamps.length / 2);
+            
+            updateTimeLabel();
+            updateTimeSlider();
+            
+            console.log(`Initialized radar playback with ${radarTimestamps.length} frames, current at index ${currentTimeIndex}`);
+            console.log('Timeline:', radarTimestamps.map(f => `${f.type}: ${new Date(f.timestamp * 1000).toLocaleTimeString()}`));
+        }
+    } catch (error) {
+        console.error('Failed to initialize radar playback:', error);
+    }
+}
+
+function togglePlayback() {
+    isPlaying = !isPlaying;
+    
+    if (isPlaying) {
+        playBtn.textContent = '⏸️';
+        startPlayback();
+    } else {
+        playBtn.textContent = '▶️';
+        stopPlayback();
+    }
+}
+
+function startPlayback() {
+    if (playInterval) clearInterval(playInterval);
+    
+    playInterval = setInterval(() => {
+        currentTimeIndex = (currentTimeIndex + 1) % radarTimestamps.length;
+        updateTimeSlider();
+        updateTimeLabel();
+        updateRadarLayer();
+    }, 800); // 800ms between frames
+}
+
+function stopPlayback() {
+    if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+    }
+}
+
+function onTimeSliderChange(event) {
+    if (isPlaying) togglePlayback();
+    
+    currentTimeIndex = parseInt(event.target.value);
+    updateTimeLabel();
+    updateRadarLayer();
+}
+
+function updateTimeSlider() {
+    if (timeSlider) {
+        timeSlider.max = radarTimestamps.length - 1;
+        timeSlider.value = currentTimeIndex;
+    }
+}
+
+function updateTimeLabel() {
+    if (!timeLabel || !radarTimestamps[currentTimeIndex]) return;
+    
+    const frame = radarTimestamps[currentTimeIndex];
+    // Use the current frame (most recent past) as reference instead of generated
+    const currentFrameIndex = radarTimestamps.findIndex(f => f.type === 'current');
+    const currentFrameTime = currentFrameIndex !== -1 ? radarTimestamps[currentFrameIndex].timestamp : Math.floor(Date.now() / 1000);
+    const diffMinutes = Math.round((frame.timestamp - currentFrameTime) / 60);
+    
+    let label;
+    if (frame.type === 'current' || Math.abs(diffMinutes) < 5) {
+        label = 'Now';
+    } else if (diffMinutes > 0) {
+        const hours = Math.floor(diffMinutes / 60);
+        const mins = diffMinutes % 60;
+        if (hours > 0) {
+            label = `+${hours}h${mins > 0 ? mins + 'm' : ''}`;
+        } else {
+            label = `+${mins}m`;
+        }
+    } else {
+        const hours = Math.floor(Math.abs(diffMinutes) / 60);
+        const mins = Math.abs(diffMinutes) % 60;
+        if (hours > 0) {
+            label = `-${hours}h${mins > 0 ? mins + 'm' : ''}`;
+        } else {
+            label = `-${mins}m`;
+        }
+    }
+    
+    timeLabel.textContent = label;
+}
+
+function updateRadarLayer() {
+    if (!map || !radarTimestamps[currentTimeIndex]) return;
+    
+    // Remove existing precipitation layer
+    if (precipitationLayer) {
+        map.removeLayer(precipitationLayer);
+        precipitationLayer = null;
+    }
+    
+    const frame = radarTimestamps[currentTimeIndex];
+    let radarUrl;
+    
+    if (frame.path) {
+        // Use specific timestamp path
+        radarUrl = `https://tilecache.rainviewer.com${frame.path}/512/{z}/{x}/{y}/${currentColorScheme}/1_1.png`;
+    } else {
+        // Use generic timestamp
+        radarUrl = `https://tilecache.rainviewer.com/v2/radar/${Math.floor(frame.timestamp)}/512/{z}/{x}/{y}/${currentColorScheme}/1_1.png`;
+    }
+    
+    // Create new precipitation layer
+    precipitationLayer = L.tileLayer(radarUrl, {
+        attribution: '&copy; <a href="https://rainviewer.com">RainViewer</a>',
+        opacity: 0.7,
+        zIndex: 200,
+        maxZoom: 20
+    });
+    
+    precipitationLayer.addTo(map);
 }
 
 
