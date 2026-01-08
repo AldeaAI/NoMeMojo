@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Location App</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌧️ Weather Location App</h1>
+            <p>Get your location and rain forecast</p>
+        </header>
+        
+        <main>
+            <div class="controls">
+                <button id="getLocationBtn">📍 Get My Location</button>
+                <div id="locationInfo" class="location-info hidden">
+                    <p><strong>Coordinates:</strong> <span id="coordinates"></span></p>
+                    <p><strong>Address:</strong> <span id="address"></span></p>
+                </div>
+            </div>
+
+            <div id="mapContainer" class="map-container hidden">
+                <div id="map"></div>
+                <div class="weather-legend">
+                    <strong>Weather Radar:</strong>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(0, 255, 0, 0.5);"></div>
+                        <span>🌦️ Light Rain</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(255, 255, 0, 0.7);"></div>
+                        <span>🌧️ Moderate Rain</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(255, 0, 0, 0.8);"></div>
+                        <span>⛈️ Heavy Rain</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(255, 0, 255, 0.9);"></div>
+                        <span>🌪️ Severe</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="weatherContainer" class="weather-container hidden">
+                <div class="weather-card">
+                    <h2>Current Weather</h2>
+                    <div class="weather-info">
+                        <div class="temperature">
+                            <span id="temperature">--°C</span>
+                        </div>
+                        <div class="weather-details">
+                            <p><strong>Condition:</strong> <span id="weatherCondition">--</span></p>
+                            <p><strong>Humidity:</strong> <span id="humidity">--%</span></p>
+                            <p><strong>Wind Speed:</strong> <span id="windSpeed">-- km/h</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rain-card">
+                    <h2>Rain Forecast</h2>
+                    <div class="rain-info">
+                        <div class="rain-probability">
+                            <span class="probability-value" id="rainProbability">--%</span>
+                            <span class="probability-label">Chance of Rain</span>
+                        </div>
+                        <div class="rain-details">
+                            <p><strong>Rain Volume (1h):</strong> <span id="rainVolume1h">-- mm</span></p>
+                            <p><strong>Rain Volume (3h):</strong> <span id="rainVolume3h">-- mm</span></p>
+                            <p><strong>Clouds:</strong> <span id="clouds">--%</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="forecast-card">
+                    <h2>5-Day Rain Forecast</h2>
+                    <div id="forecastContainer" class="forecast-container">
+                        <!-- Forecast items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorContainer" class="error-container hidden">
+                <p id="errorMessage"></p>
+            </div>
+
+            <div id="loadingContainer" class="loading-container hidden">
+                <div class="spinner"></div>
+                <p>Loading weather data...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Weather data provided by Open-Meteo API</p>
+            <p>Free weather API with no registration required!</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
